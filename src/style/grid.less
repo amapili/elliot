@@ -1,0 +1,190 @@
+.container,
+.col {
+    display: flex;
+    flex-flow: column nowrap;
+    padding-left: @grid-padding;
+    padding-right: @grid-padding;
+}
+
+.container {
+    margin-right: auto;
+    margin-left: auto;
+    padding-top: @grid-padding;
+    padding-bottom: @grid-padding;
+    min-height: 100vh;
+
+    .container {
+        min-height: 0;
+    }
+
+    .break-upward( {
+            width: @container-widths[$@size];
+        }
+
+    );
+
+    .break-downward( {
+            &.fluid@{sz} {
+                width: 100%;
+            }
+        }
+
+    );
+
+    &.fluid-true {
+        width: 100%;
+    }
+}
+
+.col {
+    flex: 1 0 0%;
+    max-width: 100%;
+
+    &.padded-true {
+        padding-top: @grid-padding;
+        padding-bottom: @grid-padding;
+    }
+}
+
+.row {
+    display: flex;
+    flex-flow: row wrap;
+    align-items: flex-start;
+    margin-left: -@grid-padding;
+    margin-right: -@grid-padding;
+    flex: 0 0 auto;
+
+    &.gutter-false {
+        >.col {
+            padding-top: 0;
+            padding-bottom: 0;
+            padding-left: 0;
+            padding-right: 0;
+        }
+    }
+
+    &+.row {
+        margin-top: @grid-padding;
+
+        &.gutter-false {
+            margin-top: 0;
+        }
+    }
+}
+
+@grid-max: 12;
+
+@flex-props: {
+    @sized: {
+        wrap: true, false, reverse;
+        justify: flex-start, flex-end, center, space-between;
+        align: stretch, flex-start, flex-end, center, baseline;
+        alignSelf: auto, stretch, flex-start, flex-end, center, baseline;
+        order: range(0, @grid-max);
+        span+: auto, grow;
+        span+: range(1, @grid-max);
+    }
+
+    @names: {
+        wrap: flex-wrap;
+        justify: justify-content;
+        align: align-items;
+        alignSelf: align-self;
+        order: order;
+    }
+
+    @wrap: {
+        true: wrap;
+        false: nowrap;
+        reverse: wrap-reverse;
+    }
+}
+
+.break-upward( {
+        #prop(@key, @value) when not (@key =span) {
+            @prop: @flex-props[@names][$@key];
+            @{prop}: if(@key =wrap, @flex-props[@wrap][$@value], @value);
+        }
+
+        #prop(@key, @value) when (@key =span) {
+            flex: if(@value =grow, 1 0 0%, 0 0 if(@value =auto, auto, (100% / @grid-max * @value)));
+        }
+
+        each(@flex-props[@sized], {
+                each(@value, .(@value) {
+                        .@{key}@{sz}-@{value} {
+                            #prop(@key, @value);
+                        }
+                    }
+
+                );
+            }
+
+        );
+    }
+
+);
+
+.break-upward( {
+        @sides: true, false, x, y, top, left, bottom, right;
+
+        .pad(@side) when ((@side =true) or (@side =y) or (@side =top)) {
+            padding-top: @grid-padding;
+        }
+
+        .pad(@side) when ((@side =true) or (@side =y) or (@side =bottom)) {
+            padding-bottom: @grid-padding;
+        }
+
+        .pad(@side) when ((@side =true) or (@side =x) or (@side =left)) {
+            padding-left: @grid-padding;
+        }
+
+        .pad(@side) when ((@side =true) or (@side =x) or (@side =right)) {
+            padding-right: @grid-padding;
+        }
+
+        .pad(@side) when (@side =false) {
+            padding-top: 0;
+            padding-bottom: 0;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        each(@sides, .(@side) {
+                .pad@{sz}-@{side} {
+                    .pad(@side);
+                }
+            }
+
+        );
+    }
+
+);
+
+.break-upward( {
+        .display@{sz}-false {
+            display: none;
+            &.col, &.row {
+                display: none;
+            }
+
+            span& {
+                display: none;
+            }
+        }
+
+        .display@{sz}-true {
+            display: block;
+
+            &.col, &.row {
+                display: flex;
+            }
+
+            span& {
+                display: inline;
+            }
+        }
+    }
+
+);

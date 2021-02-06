@@ -1,0 +1,189 @@
+#theme() {
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+    --primary: #007bff;
+    --primary-dark: #0069d9;
+    --primary-text: #fff;
+    --secondary: #435e75;
+    --secondary-dark: #585f67;
+    --secondary-text: #fff;
+    --danger: #bf4b38;
+    --danger-dark: #913b1c;
+    --danger-text: #fff;
+    --warning: #f2b500;
+    --warning-dark: #a56900;
+    --warning-text: #000;
+    --success: #79c818;
+    --success-dark: rgb(79, 137, 9);
+    --success-text: #000;
+    --text: rgba(0, 0, 0, 0.95);
+    --muted: rgba(0, 0, 0, 0.65);
+    --page-bg: rgba(0, 0, 0, 0.005);
+    --sidebar-bg: rgba(0, 0, 0, 0.015);
+    --card-bg: #ffffff;
+    --dialog-bg: #ffffff;
+    --hr: rgba(0, 0, 0, 0.125);
+    --card-head: rgba(0, 0, 0, 0.05);
+    --top-bg: #fff;
+    --top-text: #000;
+
+    --input-text: #3c3c3c;
+    --input-border: rgba(0, 0, 0, 0.3);
+    --input-label: #939393;
+    --input-hint: rgba(0, 0, 0, 0.45);
+    --input-control: #a5a5a5;
+    --input-focus: #2196f3;
+    --placeholder: #a5a5a5;
+
+    --table-heading: #696969;
+    --table-bg: #fff;
+    --table-sep: #f2f2f2;
+
+    --overlay: rgba(0, 0, 0, 0.1);
+    --button-highlight: rgba(0, 0, 0, 0.06);
+
+    --highlight: #f0f9fa;
+    --select-border: rgba(110, 190, 255, 0.7);
+    --select: rgba(110, 190, 255, 0.35);
+
+    --large-shadow: 0px 6px 30px rgba(0, 0, 0, 0.2), 0px 1px 8px rgba(0, 0, 0, 0.05);
+    --small-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+
+    --loading-fade: rgba(255, 255, 255, 1);
+    --loading-fade-0: rgba(255, 255, 255, 0);
+
+    --alert-bg: rgba(255, 255, 255, 0.8);
+
+    --overlay-transition: 150ms ease-out;
+}
+
+:root {
+    each(#theme(), {
+            @{key}: @value;
+        }
+
+    );
+}
+
+#theme-vars() {
+    each(#theme(), {
+            @k: replace(@key, "--", "");
+            @{k}: ~"var(@{key})";
+        }
+
+    );
+}
+
+@theme: #theme-vars();
+
+.overlay-transition(...) {
+    each(@arguments, {
+            transition+: @value @theme[overlay-transition];
+        }
+
+    );
+}
+
+.get-colors(@color) {
+    @tn: %("%s-text", @color);
+    @dn: %("%s-dark", @color);
+
+    text: @theme[$@tn];
+    main: @theme[$@color];
+    dark: @theme[$@dn];
+}
+
+@colors: primary, secondary, danger, warning, success;
+
+.colors(@content) {
+    each(@colors, .(@name) {
+            @tn: %("%s-text", @name);
+            @dn: %("%s-dark", @name);
+
+            @color-text: @theme[$@tn];
+            @color: @theme[$@name];
+            @color-dark: @theme[$@dn];
+            @content();
+        }
+
+    )
+}
+
+@sizes: {
+    xs: 0;
+    sm: 576px;
+    md: 768px;
+    lg: 992px;
+    xl: 1200px;
+}
+
+@grid-padding: 15px;
+
+@container-widths: {
+    xs: 100%;
+    sm: 540px;
+    md: 720px;
+    lg: 960px;
+    xl: 1140px;
+}
+
+#break(@size) {
+    @min: @sizes[$@size];
+    @max: @min - 0.02;
+    min:~"(min-width: @{min})";
+    max:~"(max-width: @{max})";
+}
+
+.break-min(@size, @content) when (@size =xs) {
+    @content();
+}
+
+.break-min(@size, @content) when not (@size =xs) {
+    @q: #break(@size)[min];
+
+    @media @q {
+        @content()
+    }
+}
+
+.break-max(@size, @content) when (@size =xs) {
+    @content();
+}
+
+.break-max(@size, @content) when not (@size =xs) {
+    @q: #break(@size)[max];
+
+    @media @q {
+        @content()
+    }
+}
+
+.break-downward(@content) {
+    each(@sizes, .(@breakpoint, @size) {
+            .break-max(@size, {
+                    @sz: if(@size =xs, ~"", ~"-@{size}");
+                    @content();
+                }
+
+            )
+        }
+
+    )
+}
+
+.break-upward(@content) {
+    each(@sizes, .(@breakpoint, @size) {
+            .break-min(@size, {
+                    @sz: if(@size =xs, ~"", ~"-@{size}");
+                    @content();
+                }
+
+            )
+        }
+
+    )
+}
+
+@phone: #break(sm)[max];
+@mobile: #break(md)[max];
+@desktop: #break(md)[max];

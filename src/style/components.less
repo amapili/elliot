@@ -1,0 +1,230 @@
+.link {
+    text-decoration: none;
+    color: inherit;
+
+    .icon {
+        position: relative;
+        top: 0.1em;
+    }
+
+    .colors( {
+            &.@{name} {
+                color: @color;
+            }
+        }
+
+    );
+}
+
+@keyframes spinner-rotation {
+    0% {
+        transform: rotate(-90deg);
+    }
+
+    100% {
+        transform: rotate(270deg);
+    }
+}
+
+@keyframes spinner-size {
+    0% {
+        stroke-dasharray: 1px, 200px;
+        stroke-dashoffset: 0px;
+    }
+
+    50% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -15px;
+    }
+
+    100% {
+        stroke-dasharray: 100px, 200px;
+        stroke-dashoffset: -125px;
+    }
+}
+
+.loading {
+    display: block;
+    text-align: center;
+    font-size: 40px;
+    width: 100%;
+
+    .spinner {
+        clear: both;
+        color: @theme[primary];
+    }
+}
+
+.spinner {
+    display: inline-block;
+    font-size: inherit;
+    width: 1em;
+    height: 1em;
+    animation: spinner-rotation 1.4s infinite linear;
+    opacity: 0.9;
+
+    svg {
+        display: block;
+        stroke-dasharray: 80px, 200px;
+        stroke-dashoffset: 0px;
+        animation: spinner-size 1.4s infinite ease-in-out;
+    }
+}
+
+@keyframes loading-text-bg {
+    0% {
+        opacity: 0.02;
+    }
+
+    50% {
+        opacity: 0.035;
+    }
+
+    100% {
+        opacity: 0.02;
+    }
+}
+
+@keyframes loading-text {
+    0% {
+        left: -20%;
+        opacity: 0;
+    }
+
+    40% {
+        opacity: 0.6;
+    }
+
+    60% {
+        opacity: 0.4;
+    }
+
+    100% {
+        left: 100%;
+        opacity: 0.8;
+    }
+}
+
+.loading-fade {
+    background-color: @theme[text];
+    overflow: hidden;
+    animation: loading-text-bg 3s infinite ease-in-out;
+
+    &:after {
+        content: '';
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 80%;
+        background: linear-gradient(to right, @theme[loading-fade-0], @theme[loading-fade], @theme[loading-fade], @theme[loading-fade-0]);
+        animation: loading-text 3s infinite ease-in-out;
+    }
+}
+
+.loading-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    border-radius: inherit;
+    &.text {
+        position: relative;
+        display: inline-block;
+        height: 1.2em;
+        margin-top: -.1em;
+        border-radius: 0.2em;
+    }
+}
+
+.loading-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background-color: @theme[primary];
+    z-index: 100000;
+    opacity: 0;
+    transition: opacity 50ms linear;
+}
+
+.collapse {
+    display: block;
+    overflow: hidden;
+
+    &.hide {
+        display: none;
+    }
+
+    &.anim {
+        transition+: height 150ms ease-out;
+        transition+: opacity 100ms ease-out;
+    }
+}
+
+.image {
+    overflow: hidden;
+    border-radius: 8px;
+
+    &,
+    & img,
+    & .color {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+    }
+
+    .color {
+        background-color: @theme[primary];
+    }
+
+    img {
+        object-fit: cover;
+        pointer-events: none;
+    }
+
+    .tag {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        border-radius: 4px;
+        padding: 4px 0.4em;
+        line-height: 1;
+        min-width: 2em;
+        background-color: @theme[overlay];
+        text-align: center;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        cursor: default;
+    }
+}
+
+.drag-container {
+    position: relative;
+
+    .select {
+        position: absolute;
+        border: 1px solid @theme[select-border];
+        background-color: @theme[select];
+        z-index: 1;
+    }
+
+    .dragging {
+        >* {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 2;
+        }
+
+        &.active>* {
+            opacity: 1;
+            transform: scale(1.05);
+            transition: opacity 100ms ease-out, transform 100ms ease-out;
+        }
+    }
+}

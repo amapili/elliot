@@ -1,0 +1,319 @@
+.backdrop {
+    display: block;
+    position: static;
+    z-index: 3000;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    .overlay-transition(opacity, backdrop-filter, -webkit-backdrop-filter);
+
+    .break-downward( {
+            &.overlay@{sz} {
+                position: fixed;
+                display: flex;
+                background-color: @theme[overlay];
+                justify-content: center;
+                align-items: center;
+
+                &.entering,
+                &.exiting {
+                    opacity: 0;
+                    pointer-events: none;
+                    backdrop-filter: blur(0);
+                    -webkit-backdrop-filter: blur(0);
+                }
+
+                &.entered {
+                    opacity: 1;
+                    backdrop-filter: blur(4px);
+                    -webkit-backdrop-filter: blur(4px);
+                }
+            }
+        }
+
+    );
+
+    .break-upward( {
+            &.show@{sz} {
+                opacity: 1;
+                position: static;
+
+                .drawer-left {
+                    opacity: 1;
+                    transform: none;
+                }
+            }
+        }
+
+    );
+
+    .break-downward( {
+            &.hide@{sz} {
+                opacity: 0;
+                pointer-events: none;
+
+                .drawer-right {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+        }
+
+    );
+
+    @media print {
+        display: none !important;
+    }
+}
+
+.dialog {
+    position: relative;
+    max-height: 100%;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border-radius: 6px;
+    box-shadow: @theme[large-shadow];
+    background: @theme[dialog-bg];
+    .overlay-transition(transform);
+    transform: translateY(0);
+
+    .entering & {
+        transform: translateY(-16px);
+    }
+
+    >.btn-container .close {
+        position: absolute;
+        right: 0;
+        top: 0;
+    }
+
+    >.title {
+        margin: 12px;
+        font-size: 24px;
+    }
+}
+
+.popover {
+    background-color: @theme[dialog-bg];
+    border-radius: 3px;
+    box-shadow: @theme[small-shadow];
+    .overlay-transition(left, top, right, width, height);
+    overflow: hidden;
+    position: absolute;
+    max-width: calc(100vw - 24px);
+    max-height: calc(100vh - 24px);
+
+    .sizer {
+        position: relative;
+        width: auto;
+        height: auto;
+        display: table-cell;
+    }
+}
+
+.menuItem {
+    height: 32px;
+    box-sizing: border-box;
+    cursor: pointer;
+    line-height: 1;
+    padding: 8px 18px;
+    transition: all 150ms ease-out;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    display: block;
+
+    &.hovered {
+        background-color: @theme[button-highlight];
+    }
+
+    &.selected {
+        color: @theme[primary];
+    }
+}
+
+.alert {
+    margin: 0.8em 0;
+    background-color: @theme[alert-bg];
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: 0.5em;
+    overflow: hidden;
+    position: relative;
+
+    >div {
+        display: flex;
+        padding: 0.8em;
+    }
+
+    &:before {
+        content: ' ';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        right: 0;
+        opacity: 0.15;
+    }
+
+    .colors( {
+            &.@{name} {
+                color: @color-dark;
+
+                &:before {
+                    background-color: @color;
+                }
+
+                .close.icon {
+                    color: @color-dark;
+                }
+
+                div.icon {
+                    color: @color;
+                }
+            }
+        }
+
+    );
+
+    div.icon {
+        font-size: 1.5em;
+        height: 1em;
+        padding-right: 0.2em;
+    }
+
+    .close {
+        width: 1.5em;
+        height: 1.5em;
+        padding: 0;
+
+        .icon {
+            width: 1.25em;
+            height: 1.25em;
+        }
+    }
+
+    .content {
+        flex-grow: 1;
+        align-self: center;
+        font-size: 0.9em;
+        padding: 0 0.4em;
+
+        .title {
+            font-size: (1 / 0.9em);
+            font-weight: 500;
+            padding: 0;
+            margin: 0;
+            padding-bottom: 0.5em;
+        }
+    }
+
+    .action {
+        position: relative;
+        align-self: center;
+        margin: -0.5em 0;
+    }
+
+    &.collapse {
+        transition+: opacity 150ms ease-out;
+        transition+: height 150ms ease-out;
+        transition+: margin 150ms ease-out;
+
+        &:not(.show) {
+            opacity: 0;
+            margin: 0;
+        }
+    }
+}
+
+@keyframes notif-enter {
+    0% {
+        opacity: 0;
+        transform: translateY(100%);
+    }
+
+    100% {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.notification {
+    bottom: 0;
+    transition: bottom 200ms ease-out;
+
+    >* {
+        position: fixed;
+        right: @grid-padding;
+        bottom: inherit;
+        z-index: 4000;
+        animation: notif-enter 200ms ease-out;
+    }
+
+    &.exit>* {
+        transition: 100ms opacity ease-out, 100ms transform ease-out;
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    .alert {
+        min-width: 288px;
+        max-width: 568px;
+
+        @media @mobile {
+            max-width: calc(100vw - (2 * @grid-padding));
+        }
+
+        @media @phone {
+            left: @grid-padding;
+        }
+    }
+}
+
+.drawer-left,
+.drawer-right {
+    position: fixed;
+    box-shadow: 0 0 2px @theme[hr];
+    .overlay-transition(transform, opacity);
+    z-index: 4;
+    box-sizing: content-box;
+    opacity: 0;
+
+    .entered & {
+        opacity: 1;
+        transform: none;
+    }
+}
+
+.drawer-left,
+.drawer-right {
+    top: 0;
+    bottom: 0;
+}
+
+.drawer-left {
+    left: 0;
+    transform: translateX(-100%);
+}
+
+.drawer-right {
+    right: 0;
+    transform: translateX(100%);
+}
+
+.drawer-bottom,
+.drawer-top {
+    left: 0;
+    right: 0;
+}
+
+.drawer-bottom {
+    left: 0;
+    transform: translateY(100%);
+}
+
+.drawer-top {
+    top: 0;
+    transform: translateY(-100%);
+}
