@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, SetStateAction, useContext } from 'react'
 import { Map } from 'immutable'
 
 export interface FormState {
@@ -7,12 +7,23 @@ export interface FormState {
     loading: boolean
 }
 
-export type FormData = FormState & { id: string; clearError: () => void } & ({
+export interface FormData extends FormState {
+    id: string
+    clearError: () => void
     data: Map<string, unknown>
-    setData: (cb: (m: Map<string, unknown>) => Map<string, unknown>) => void
-} | { data?: undefined; setData?: undefined })
+    setData: (cb: (m: Map<string, unknown>) => Map<string, unknown>) => void,
+    submit: (modify?: SetStateAction<Map<string, unknown>>) => Promise<void>
+}
 
-export const FormContext = createContext<FormData>({ id: '', loading: false, success: false, clearError: () => { } })
+export const FormContext = createContext<FormData>({
+    id: '',
+    loading: false,
+    success: false,
+    clearError: () => { },
+    data: Map(),
+    setData: () => { },
+    submit: async () => { }
+})
 
 export default function useFormData() {
     return useContext(FormContext)
